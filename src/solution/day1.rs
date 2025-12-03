@@ -103,3 +103,18 @@ pub fn puzzle2(input: &str) -> Result<u32> {
     }
     Ok(res)
 }
+
+#[cfg(test)]
+const TEST_INPUT: &str = r#"L68
+L30
+R48
+L5
+R60
+L55
+L1
+L99
+R14
+L82
+"#;
+
+crate::aoc_tests!(TEST_INPUT, 3, 6);

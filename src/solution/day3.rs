@@ -78,3 +78,11 @@ pub fn puzzle2(input: &str) -> Result<u64> {
     
     Ok(joltage)
 }
+
+const TEST_INPUT: &str = r#"987654321111111
+811111111111119
+234234234234278
+818181911112111
+"#;
+
+crate::aoc_tests!(TEST_INPUT, 357, 3121910778619);

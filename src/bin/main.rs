@@ -1,4 +1,7 @@
-use std::{io::{Read, stdin}, path::PathBuf};
+use std::{
+    io::{Read, stdin},
+    path::PathBuf,
+};
 
 use clap::Parser;
 
@@ -10,24 +13,26 @@ struct Args {
     #[arg(short, long)]
     puzzle: u8,
 
-    #[arg(default_value = "input.txt")]
+    #[arg()]
     input_file: Option<PathBuf>,
 }
 fn main() -> anyhow::Result<()> {
     let args = Args::parse();
 
-    let input = match args.input_file {
+    let mut buf = Vec::new();
+
+    match args.input_file {
         Some(ref path) => {
-            std::fs::read_to_string(path)?
+            std::fs::File::open(path)?.read_to_end(&mut buf)?;
         }
         None => {
-            let mut input = Vec::new();
-            stdin().read_to_end(&mut input)?;
-            String::from_utf8(input)?
+            stdin().read_to_end(&mut buf)?;
         }
     };
 
-    let result = aoc::solution::run_solution(args.day, args.puzzle, &input)?;
+    let input = String::from_utf8(buf)?;
+
+    let result = aoc::solution::run_solution(args.day, args.puzzle, &input.trim())?;
 
     println!("{}", result);
 

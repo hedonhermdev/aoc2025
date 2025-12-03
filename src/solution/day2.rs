@@ -3,7 +3,7 @@ use std::{ops::RangeInclusive, path::Path};
 
 type Input = Vec<RangeInclusive<u64>>;
 
-fn read_input(input: &str) -> Result<Input> {
+fn parse_input(input: &str) -> Result<Input> {
     input.split(",")
     .map(|s| {
         let (start, end) = s.split_once("-").context("invalid range in input")?;
@@ -16,9 +16,9 @@ fn read_input(input: &str) -> Result<Input> {
     .collect()
 }
 
-fn is_invalid1(id: u64) -> bool{
+fn is_invalid1(id: u64) -> bool {
     let digits = (id as f64).log10().floor() as u32 + 1;
-    if digits.is_multiple_of(2) {
+    if !digits.is_multiple_of(2) {
         false
     } else {
         let div = 10u64.pow(digits / 2);
@@ -29,7 +29,7 @@ fn is_invalid1(id: u64) -> bool{
 }
 
 pub fn puzzle1(input: &str) -> Result<u64> {
-    let input = read_input(input)?;
+    let input = parse_input(input)?;
 
     Ok(input.into_iter().flat_map(|r| r.into_iter()).filter(|&id| is_invalid1(id)).sum())
 }
@@ -62,7 +62,12 @@ fn is_invalid2(id: u64) -> bool {
 }
 
 pub fn puzzle2(input: &str) -> Result<u64> {
-    let input = read_input(input)?;
+    let input = parse_input(input)?;
     
     Ok(input.into_iter().flat_map(|r| r.into_iter()).filter(|&id| is_invalid2(id)).sum())
 }
+
+#[cfg(test)]
+const TEST_INPUT: &str = r#"11-22,95-115,998-1012,1188511880-1188511890,222220-222224,1698522-1698528,446443-446449,38593856-38593862,565653-565659,824824821-824824827,2121212118-2121212124"#;
+
+crate::aoc_tests!(TEST_INPUT, 1227775554, 4174379265);
