@@ -1,0 +1,41 @@
+Advent of code 2025
+Day 1 - Part 1: 997
+	generator: 238.5µs,
+	runner: 23.6µs
+
+Day 1 - Part 2: 5978
+	generator: 152.9µs,
+	runner: 67.1µs
+
+Day 2 - Part 1: 8576933996
+	generator: 28.8µs,
+	runner: 20.9828ms
+
+Day 2 - Part 2: 25663320831
+	generator: 566.4µs,
+	runner: 126.504ms
+
+Day 3 - Part 1: 17166
+	generator: 57.9µs,
+	runner: 50µs
+
+Day 3 - Part 2: 169077317650774
+	generator: 25.9µs,
+	runner: 80.1µs
+
+Day 4 - Part 1: 1433
+	generator: 161.7µs,
+	runner: 3.2885ms
+
+Day 4 - Part 2: 8616
+	generator: 157.7µs,
+	runner: 5.3074ms
+
+Day 5 - Part 1: 681
+	generator: 94.5µs,
+	runner: 83.5µs
+
+Day 5 - Part 2: 348820208020395
+	generator: 85µs,
+	runner: 10.9µs
+
