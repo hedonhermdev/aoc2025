@@ -1,4 +1,4 @@
-use std::path::Path;
+use aoc_runner_derive::*;
 
 use anyhow::Result;
 
@@ -44,7 +44,8 @@ impl Dial {
 
 type Input = Vec<Rotation>;
 
-fn parse_input(input: &str) -> Result<Input> {
+#[aoc_generator(day1)]
+fn parse_input(input: &str) -> Input {
     input
         .lines()
         .map(|line| {
@@ -54,40 +55,41 @@ fn parse_input(input: &str) -> Result<Input> {
                 "R" => Direction::Right,
                 _ => panic!("Invalid direction character"),
             };
-            let distance: u32 = dist_str.parse()?;
-            Ok(Rotation {
+            let distance: u32 = dist_str.parse().unwrap();
+
+            Rotation {
                 direction,
                 distance,
-            })
+            }
         })
         .collect()
 }
 
-pub fn puzzle1(input: &str) -> Result<u32> {
-    let rotations = parse_input(input)?;
+#[aoc(day1, part1)]
+fn puzzle1(input: &[Rotation]) -> u32 {
     let mut dial = Dial::new();
 
     let mut res = 0;
 
-    for rotation in rotations {
-        if dial.rotate(&rotation) == 0 {
+    for rotation in input {
+        if dial.rotate(rotation) == 0 {
             res += 1;
         }
     }
 
-    Ok(res)
+    res
 }
 
-pub fn puzzle2(input: &str) -> Result<u32> {
-    let rotations = parse_input(input)?;
+#[aoc(day1, part2)]
+fn puzzle2(input: &[Rotation]) -> u32 {
     let mut dial = Dial::new();
 
     let mut res = 0;
 
-    for rotation in rotations {
+    for rotation in input {
         let prev_pos = dial.pos();
 
-        let new_pos = dial.rotate(&rotation);
+        let new_pos = dial.rotate(rotation);
 
         let cycles = rotation.distance / 100;
 
@@ -101,7 +103,7 @@ pub fn puzzle2(input: &str) -> Result<u32> {
             res += 1;
         }
     }
-    Ok(res)
+    res
 }
 
 #[cfg(test)]
@@ -118,4 +120,4 @@ R14
 L82
 "#;
 
-crate::aoc_tests!(TEST_INPUT, 3, 6);
+crate::aoc_test!(TEST_INPUT, 3, 6);

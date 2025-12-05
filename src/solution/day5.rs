@@ -1,8 +1,9 @@
 use std::ops::RangeInclusive;
 
-use anyhow::{Context, Result};
+use aoc_runner_derive::*;
 
 type Id = usize;
+type Input = (Vec<RangeInclusive<Id>>, Vec<Id>);
 
 #[derive(Debug)]
 struct Inventory {
@@ -16,12 +17,11 @@ impl Inventory {
         let mut merged = vec![ranges[0].clone()];
         
         for range in ranges {
-            if let Some(last) = merged.last_mut() {
-                if range.start() <= last.end() {
+            if let Some(last) = merged.last_mut()
+                && range.start() <= last.end() {
                     *last = *last.start().min(range.start())..=*last.end().max(range.end());
                     continue;
                 }
-            }
             merged.push(range);          
         }
 
@@ -48,7 +48,7 @@ impl Inventory {
             }
         }
         
-        return false;
+        false
     }
     
     fn fresh_id_count(&self) -> usize {
@@ -63,55 +63,56 @@ impl Inventory {
 }
 
 
-fn parse_input(input: &str) -> Result<(Vec<RangeInclusive<Id>>, Vec<Id>)> {
+#[aoc_generator(day5)]
+fn parse_input(input: &str) -> Input {
     let mut ranges = vec![];
     let mut ids = vec![];
 
     let mut lines = input.lines();
     
-    while let Some(line) = lines.next() {
+    for line in lines.by_ref() {
         if line.is_empty() {
             break;
         }
-        let (lo, hi) = line.split_once("-").context("invalid range")?;
-        let lo = lo.parse::<usize>()?;
-        let hi = hi.parse::<usize>()?;
+        let (lo, hi) = line.split_once("-").unwrap();
+        let lo = lo.parse::<usize>().unwrap();
+        let hi = hi.parse::<usize>().unwrap();
         
         ranges.push(lo..=hi);
     }
     
-    while let Some(line) = lines.next() {
-        ids.push(line.parse::<usize>()?);
+    for line in lines {
+        ids.push(line.parse::<usize>().unwrap());
     }
     
-    Ok((ranges, ids))
+    (ranges, ids)
 }
 
-pub fn puzzle1(input: &str) -> anyhow::Result<usize> {
-    let (ranges, ids) = parse_input(input)?;
+#[aoc(day5, part1)]
+pub fn puzzle1(input: &Input) -> usize {
+    let (ranges, ids) = input;
     
-    let inventory = Inventory::new(ranges);
+    let inventory = Inventory::new(ranges.clone());
     
     let mut count = 0;
     
     for id in ids {
-        if inventory.is_fresh(id) {
+        if inventory.is_fresh(*id) {
             count += 1;
         }
     }
     
-    Ok(count)
+    count
 }
 
-pub fn puzzle2(input: &str) -> anyhow::Result<usize> {
-    let (ranges, _) = parse_input(input)?;
+#[aoc(day5, part2)]
+pub fn puzzle2(input: &Input) -> usize {
+    let (ranges, _) = input;
     
-    let inventory = Inventory::new(ranges);
-    dbg!(&inventory);
+    let inventory = Inventory::new(ranges.clone());
     
-    Ok(inventory.fresh_id_count())
+    inventory.fresh_id_count()
 }
-
 
 #[cfg(test)]
 const TEST_INPUT: &str = r#"
@@ -128,4 +129,4 @@ const TEST_INPUT: &str = r#"
 32
 "#;
 
-crate::aoc_tests!(TEST_INPUT, 3, 14);
+crate::aoc_test!(TEST_INPUT, 3, 14);

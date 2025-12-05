@@ -1,17 +1,18 @@
-use anyhow::{Context, Result};
-use std::{ops::RangeInclusive, path::Path};
+use aoc_runner_derive::*;
+use std::ops::RangeInclusive;
 
 type Input = Vec<RangeInclusive<u64>>;
 
-fn parse_input(input: &str) -> Result<Input> {
+#[aoc_generator(day2)]
+fn parse_input(input: &str) -> Input {
     input.split(",")
     .map(|s| {
-        let (start, end) = s.split_once("-").context("invalid range in input")?;
+        let (start, end) = s.split_once("-").unwrap();
         
-        let start = start.parse::<u64>()?;
-        let end =  end.parse::<u64>()?;
+        let start = start.parse::<u64>().unwrap();
+        let end =  end.parse::<u64>().unwrap();
         
-        Ok(start..=end)
+        start..=end
     })
     .collect()
 }
@@ -28,10 +29,9 @@ fn is_invalid1(id: u64) -> bool {
     }
 }
 
-pub fn puzzle1(input: &str) -> Result<u64> {
-    let input = parse_input(input)?;
-
-    Ok(input.into_iter().flat_map(|r| r.into_iter()).filter(|&id| is_invalid1(id)).sum())
+#[aoc(day2, part1)]
+fn puzzle1(input: &Input) -> u64 {
+    input.iter().flat_map(|r| r.clone()).filter(|&id| is_invalid1(id)).sum()
 }
 
 fn is_invalid2(id: u64) -> bool {
@@ -50,7 +50,7 @@ fn is_invalid2(id: u64) -> bool {
     };
     
     for k in 1..(n_digits/2+1) {
-        if n_digits % k == 0 {
+        if n_digits.is_multiple_of(k) {
             let group = last_n_digits(id, k);
             
             if repeat_group(group, n_digits / k) == id {
@@ -61,13 +61,12 @@ fn is_invalid2(id: u64) -> bool {
     false
 }
 
-pub fn puzzle2(input: &str) -> Result<u64> {
-    let input = parse_input(input)?;
-    
-    Ok(input.into_iter().flat_map(|r| r.into_iter()).filter(|&id| is_invalid2(id)).sum())
+#[aoc(day2, part2)]
+fn puzzle2(input: &Input) -> u64 {
+    input.iter().flat_map(|r| r.clone()).filter(|&id| is_invalid2(id)).sum()
 }
 
 #[cfg(test)]
 const TEST_INPUT: &str = r#"11-22,95-115,998-1012,1188511880-1188511890,222220-222224,1698522-1698528,446443-446449,38593856-38593862,565653-565659,824824821-824824827,2121212118-2121212124"#;
 
-crate::aoc_tests!(TEST_INPUT, 1227775554, 4174379265);
+crate::aoc_test!(TEST_INPUT, 1227775554, 4174379265);

@@ -1,6 +1,8 @@
 use std::collections::HashSet;
 
-use rayon::vec;
+use aoc_runner_derive::*;
+
+type Input = Vec<Vec<bool>>;
 
 type Pos = (usize, usize);
 
@@ -35,7 +37,7 @@ fn neighbors(pos: &Pos, rows: usize, cols: usize) -> Vec<Pos> {
 }
 
 impl Grid {
-    fn new(input: Vec<Vec<bool>>) -> Self {
+    fn new(input: &Input) -> Self {
         let rows = input.len();
         let cols = if rows > 0 { input[0].len() } else { 0 };
 
@@ -66,11 +68,6 @@ impl Grid {
             cols,
             to_remove,
         }
-    }
-
-    fn present(&self, pos: &Pos) -> bool {
-        let (x, y) = *pos;
-        self.grid[y][x] > 0
     }
 
     fn remove(&mut self, pos: &Pos) -> bool {
@@ -111,8 +108,9 @@ impl Grid {
     }
 }
 
-fn parse_input(input: &str) -> Grid {
-    let grid = input
+#[aoc_generator(day4)]
+fn parse_input(input: &str) -> Input {
+    input
         .lines()
         .map(|line| {
             line.chars()
@@ -123,19 +121,19 @@ fn parse_input(input: &str) -> Grid {
                 })
                 .collect()
         })
-        .collect();
-
-    Grid::new(grid)
+        .collect()
 }
 
-pub fn puzzle1(input: &str) -> anyhow::Result<u32> {
-    let mut grid = parse_input(input);
+#[aoc(day4, part1)]
+pub fn puzzle1(input: &Input) -> u32 {
+    let mut grid = Grid::new(input);
 
-    Ok(grid.remove_all_accessible())
+    grid.remove_all_accessible()
 }
 
-pub fn puzzle2(input: &str) -> anyhow::Result<u32> {
-    let mut grid = parse_input(input);
+#[aoc(day4, part2)]
+pub fn puzzle2(input: &Input) -> u32 {
+    let mut grid = Grid::new(input);
 
     let mut total_removed = 0;
     loop {
@@ -146,7 +144,7 @@ pub fn puzzle2(input: &str) -> anyhow::Result<u32> {
         total_removed += removed;
     }
 
-    Ok(total_removed)
+    total_removed
 }
 
 #[cfg(test)]
@@ -163,4 +161,4 @@ const TEST_INPUT: &str = r#"
 @.@.@@@.@.
 "#;
 
-crate::aoc_tests!(TEST_INPUT, 13, 43);
+crate::aoc_test!(TEST_INPUT, 13, 43);

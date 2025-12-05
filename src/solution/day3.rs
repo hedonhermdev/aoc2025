@@ -1,6 +1,7 @@
-use std::backtrace;
-
 use anyhow::Result;
+use aoc_runner_derive::*;
+
+type Input = Vec<Vec<u8>>;
 
 struct Bank<'a> {
     batteries: &'a [u8],
@@ -31,14 +32,16 @@ impl<'a> Bank<'a> {
             
             res = res * 10 + max as u64;
             lo = max_idx + 1;
-            hi = hi + 1;
+            hi += 1;
         }
         
         res
     }
 }
 
-fn parse_input(input: &str) -> Vec<Vec<u8>> {
+
+#[aoc_generator(day3)]
+fn parse_input(input: &str) -> Input {
     input
     .lines()
     .map(|line| {
@@ -47,38 +50,38 @@ fn parse_input(input: &str) -> Vec<Vec<u8>> {
     .collect()
 }
 
-pub fn puzzle1(input: &str) -> Result<u64> {
-    let input = parse_input(input);
-    
+#[aoc(day3, part1)]
+fn puzzle1(input: &Input) -> u64 {
     let n_batteries = 2;
     
     let mut joltage = 0;
     
     for row in input {
-        let bank = Bank::new(&row);
+        let bank = Bank::new(row);
         
-        joltage += bank.joltage(n_batteries) as u64;
+        joltage += bank.joltage(n_batteries);
     }
     
-    Ok(joltage)
+    joltage
 }
 
-pub fn puzzle2(input: &str) -> Result<u64> {
-    let input = parse_input(input);
+#[aoc(day3, part2)]
+pub fn puzzle2(input: &Input) -> u64 {
     
     let n_batteries = 12;
     
     let mut joltage = 0;
     
     for row in input {
-        let bank = Bank::new(&row);
+        let bank = Bank::new(row);
         
-        joltage += bank.joltage(n_batteries) as u64;
+        joltage += bank.joltage(n_batteries);
     }
     
-    Ok(joltage)
+    joltage
 }
 
+#[cfg(test)]
 const TEST_INPUT: &str = r#"
 987654321111111
 811111111111119
@@ -86,4 +89,4 @@ const TEST_INPUT: &str = r#"
 818181911112111
 "#;
 
-crate::aoc_tests!(TEST_INPUT, 357, 3121910778619);
+crate::aoc_test!(TEST_INPUT, 357, 3121910778619);
