@@ -79,7 +79,8 @@ pub fn puzzle2(input: &str) -> Result<u64> {
     Ok(joltage)
 }
 
-const TEST_INPUT: &str = r#"987654321111111
+const TEST_INPUT: &str = r#"
+987654321111111
 811111111111119
 234234234234278
 818181911112111

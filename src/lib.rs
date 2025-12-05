@@ -9,12 +9,12 @@ macro_rules! aoc_tests {
 
             #[test]
             fn test_puzzle1() {
-                assert_eq!(puzzle1($test_input).unwrap(), $p1);
+                assert_eq!(puzzle1($test_input.trim()).unwrap(), $p1);
             }
 
             #[test]
             fn test_puzzle2() {
-                assert_eq!(puzzle2($test_input).unwrap(), $p2);
+                assert_eq!(puzzle2($test_input.trim()).unwrap(), $p2);
             }
         }
     };

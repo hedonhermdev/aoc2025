@@ -148,3 +148,19 @@ pub fn puzzle2(input: &str) -> anyhow::Result<u32> {
 
     Ok(total_removed)
 }
+
+#[cfg(test)]
+const TEST_INPUT: &str = r#"
+..@@.@@@@.
+@@@.@.@.@@
+@@@@@.@.@@
+@.@@@@..@.
+@@.@@@@.@@
+.@@@@@@@.@
+.@.@.@.@@@
+@.@@@.@@@@
+.@@@@@@@@.
+@.@.@@@.@.
+"#;
+
+crate::aoc_tests!(TEST_INPUT, 13, 43);

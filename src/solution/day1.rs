@@ -105,7 +105,8 @@ pub fn puzzle2(input: &str) -> Result<u32> {
 }
 
 #[cfg(test)]
-const TEST_INPUT: &str = r#"L68
+const TEST_INPUT: &str = r#"
+L68
 L30
 R48
 L5
