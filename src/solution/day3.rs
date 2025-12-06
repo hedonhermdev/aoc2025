@@ -9,9 +9,7 @@ struct Bank<'a> {
 
 impl<'a> Bank<'a> {
     fn new(batteries: &'a [u8]) -> Self {
-        Self {
-            batteries
-        }
+        Self { batteries }
     }
 
     fn joltage(&self, n_batteries: u8) -> u64 {
@@ -22,62 +20,58 @@ impl<'a> Bank<'a> {
         for _ in 0..n_batteries {
             let mut max = 0;
             let mut max_idx = 0;
-            
+
             for j in lo..=hi {
                 if self.batteries[j] > max {
                     max = self.batteries[j];
                     max_idx = j;
-                }                 
+                }
             }
-            
+
             res = res * 10 + max as u64;
             lo = max_idx + 1;
             hi += 1;
         }
-        
+
         res
     }
 }
 
-
 #[aoc_generator(day3)]
 fn parse_input(input: &str) -> Input {
     input
-    .lines()
-    .map(|line| {
-        line.bytes().map(|b| b - b'0').collect()
-    })
-    .collect()
+        .lines()
+        .map(|line| line.bytes().map(|b| b - b'0').collect())
+        .collect()
 }
 
 #[aoc(day3, part1)]
 fn puzzle1(input: &Input) -> u64 {
     let n_batteries = 2;
-    
+
     let mut joltage = 0;
-    
+
     for row in input {
         let bank = Bank::new(row);
-        
+
         joltage += bank.joltage(n_batteries);
     }
-    
+
     joltage
 }
 
 #[aoc(day3, part2)]
 pub fn puzzle2(input: &Input) -> u64 {
-    
     let n_batteries = 12;
-    
+
     let mut joltage = 0;
-    
+
     for row in input {
         let bank = Bank::new(row);
-        
+
         joltage += bank.joltage(n_batteries);
     }
-    
+
     joltage
 }
 

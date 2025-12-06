@@ -13,25 +13,26 @@ struct Inventory {
 impl Inventory {
     fn new(mut ranges: Vec<RangeInclusive<Id>>) -> Self {
         ranges.sort_by_key(|r| *r.start());
-        
+
         let mut merged = vec![ranges[0].clone()];
-        
+
         for range in ranges {
             if let Some(last) = merged.last_mut()
-                && range.start() <= last.end() {
-                    *last = *last.start().min(range.start())..=*last.end().max(range.end());
-                    continue;
-                }
-            merged.push(range);          
+                && range.start() <= last.end()
+            {
+                *last = *last.start().min(range.start())..=*last.end().max(range.end());
+                continue;
+            }
+            merged.push(range);
         }
 
         Self { ranges: merged }
-    }    
-    
+    }
+
     fn is_fresh(&self, id: Id) -> bool {
         let mut lo = 0;
         let mut hi = self.ranges.len() - 1;
-        
+
         while lo <= hi {
             let mid = (lo + hi) / 2;
 
@@ -41,27 +42,26 @@ impl Inventory {
                 if let Some(h) = mid.checked_sub(1) {
                     hi = h;
                 } else {
-                    return false
+                    return false;
                 }
             } else {
                 lo = mid + 1;
             }
         }
-        
+
         false
     }
-    
+
     fn fresh_id_count(&self) -> usize {
         let mut count = 0;
-        
+
         for range in self.ranges.iter() {
             count += range.end() - range.start() + 1;
         }
-        
+
         count
     }
 }
-
 
 #[aoc_generator(day5)]
 fn parse_input(input: &str) -> Input {
@@ -69,7 +69,7 @@ fn parse_input(input: &str) -> Input {
     let mut ids = vec![];
 
     let mut lines = input.lines();
-    
+
     for line in lines.by_ref() {
         if line.is_empty() {
             break;
@@ -77,40 +77,40 @@ fn parse_input(input: &str) -> Input {
         let (lo, hi) = line.split_once("-").unwrap();
         let lo = lo.parse::<usize>().unwrap();
         let hi = hi.parse::<usize>().unwrap();
-        
+
         ranges.push(lo..=hi);
     }
-    
+
     for line in lines {
         ids.push(line.parse::<usize>().unwrap());
     }
-    
+
     (ranges, ids)
 }
 
 #[aoc(day5, part1)]
 pub fn puzzle1(input: &Input) -> usize {
     let (ranges, ids) = input;
-    
+
     let inventory = Inventory::new(ranges.clone());
-    
+
     let mut count = 0;
-    
+
     for id in ids {
         if inventory.is_fresh(*id) {
             count += 1;
         }
     }
-    
+
     count
 }
 
 #[aoc(day5, part2)]
 pub fn puzzle2(input: &Input) -> usize {
     let (ranges, _) = input;
-    
+
     let inventory = Inventory::new(ranges.clone());
-    
+
     inventory.fresh_id_count()
 }
 
