@@ -1,121 +1,109 @@
 use core::str;
-use std::str::FromStr;
 
 use aoc_runner_derive::*;
 
-fn digit(num: u64, idx: u32) -> u64 {
-    (num / 10u64.pow(idx)) % 10
+#[allow(dead_code)]
+fn parse_input(input: &str) -> &str {
+    input
 }
 
-#[derive(Clone, Copy, Debug)]
-enum Operator {
-    Add,
-    Mul,
-}
+fn read_number_row(line: &[u8]) -> u64 {
+    let mut num = 0;
 
-impl FromStr for Operator {
-    type Err = ();
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "+" => Ok(Operator::Add),
-            "*" => Ok(Operator::Mul),
-            _ => Err(()),
-        }
-    }
-}
-
-#[derive(Clone, Debug)]
-struct Problem<'a> {
-    block: Vec<&'a str>,
-}
-
-impl<'a> Problem<'a> {
-    fn new(block: Vec<&'a str>) -> Self {
-        Self { block }
+    for &b in line {
+        num = num * 10 + (b - b'0') as u64;
     }
 
-    fn solve1(&self) -> u64 {
-        let op = self.block[self.block.len() - 1]
-            .trim()
-            .parse::<Operator>()
-            .unwrap();
+    num
+}
 
-        let operands = self.block[..self.block.len() - 1]
-            .iter()
-            .map(|line| line.trim().parse::<u64>().unwrap());
+fn read_number_col(lines: &[&[u8]], idx: usize) -> u64 {
+    let mut num = 0;
 
-        match op {
-            Operator::Add => operands.sum(),
-            Operator::Mul => operands.product(),
+    for line in lines {
+        if line[idx] != b' ' {
+            num = num * 10 + (line[idx] - b'0') as u64;
         }
     }
 
-    fn solve2(&self) -> u64 {
-        let op = self.block[self.block.len() - 1]
-            .trim()
-            .parse::<Operator>()
-            .unwrap();
-
-        let mut operands = vec![];
-
-        for col in 0..self.block[0].len() {
-            let mut s = String::new();
-            for row in self.block[..self.block.len() - 1].iter() {
-                s.push(row.as_bytes()[col] as char);
-            }
-
-            operands.push(s.trim().parse::<u64>().unwrap());
-        }
-
-        match op {
-            Operator::Add => operands.iter().sum(),
-            Operator::Mul => operands.iter().product(),
-        }
-    }
-}
-
-fn parse_input(input: &str) -> Vec<Problem<'_>> {
-    let lines: Vec<_> = input.lines().collect();
-
-    let operator_line = lines[lines.len() - 1];
-
-    let mut block_ranges = vec![];
-
-    let mut start = 0;
-    for i in 1..operator_line.len() {
-        if !operator_line.as_bytes()[i].is_ascii_whitespace() {
-            block_ranges.push(start..i - 1);
-            start = i;
-        }
-    }
-    block_ranges.push(start..operator_line.len());
-
-    let mut problems = vec![];
-
-    for block_range in block_ranges {
-        let str_block: Vec<&str> = lines
-            .iter()
-            .map(|line| &line[block_range.clone()])
-            .collect();
-        problems.push(Problem::new(str_block));
-    }
-
-    problems
+    num
 }
 
 #[aoc(day6, part1)]
 fn puzzle1(input: &str) -> u64 {
-    let input = parse_input(input);
+    let mut lines = input.lines().map(|s| s.as_bytes()).collect::<Vec<_>>();
 
-    input.iter().map(Problem::solve1).sum()
+    let op_line = lines.pop().unwrap();
+
+    let mut ops = vec![];
+    let mut blocks = vec![];
+
+    let mut start = 0;
+    for c in 1..op_line.len() {
+        if op_line[c] != b' ' {
+            blocks.push(start..c - 1);
+            ops.push(op_line[start]);
+            start = c;
+        }
+    }
+    blocks.push(start..op_line.len());
+    ops.push(op_line[start]);
+
+    let mut res = 0;
+
+    for (block, op) in blocks.into_iter().zip(ops.into_iter()) {
+        let mut s = 0;
+        for line in &lines {
+            let num = read_number_row(line[block.clone()].trim_ascii());
+            if op == b'*' {
+                if s == 0 {
+                    s = num;
+                } else {
+                    s *= num;
+                }
+            } else {
+                s += num;
+            }
+        }
+
+        res += s;
+    }
+
+    res
 }
 
 #[aoc(day6, part2)]
 fn puzzle2(input: &str) -> u64 {
-    let input = parse_input(input);
+    let lines = input.lines().map(|s| s.as_bytes()).collect::<Vec<_>>();
 
-    input.iter().map(Problem::solve2).sum()
+    let mut idx = lines[0].len() - 1;
+    let op_line = lines.len() - 1;
+
+    let mut operands = vec![];
+    let mut res = 0;
+
+    loop {
+        operands.push(read_number_col(&lines[..op_line], idx));
+
+        if lines[op_line][idx] != b' ' {
+            if lines[op_line][idx] == b'*' {
+                res += operands.drain(..).product::<u64>()
+            } else {
+                res += operands.drain(..).sum::<u64>()
+            }
+            if idx == 0 {
+                // last block
+                break;
+            } else {
+                // skip empty col before next block
+                idx -= 1;
+            }
+        }
+
+        idx -= 1;
+    }
+
+    res
 }
 
 #[cfg(test)]
@@ -126,16 +114,4 @@ const TEST_INPUT: &str = "\
 *   +   *   +  
 ";
 
-#[cfg(test)]
-mod test {
-    use super::*;
-    #[test]
-    fn test_puzzle1(){
-        assert_eq!(puzzle1(TEST_INPUT),4277556);
-    }
-    #[test]
-    fn test_puzzle2(){
-        assert_eq!(puzzle2(TEST_INPUT),3263827);
-    }
-
-    }
+crate::aoc_test!(TEST_INPUT, 4277556, 3263827);
